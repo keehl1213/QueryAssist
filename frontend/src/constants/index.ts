@@ -1,0 +1,5 @@
+export const SYSTEM_OPTION = {
+	SPEECH_ENDPOINT: import.meta.env.VITE_SPEECH_ENDPOINT,
+	SPEECH_KEY: import.meta.env.VITE_SPEECH_KEY,
+	AI_SPEECH_ENABLE: import.meta.env.VITE_AI_SPEECH_ENABLE,
+};

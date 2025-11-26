@@ -1,0 +1,27 @@
+containerize:
+  services:
+    - docker:dind
+  image: my.repo.cc/release/docker:latest
+  variables:
+    COMPANY_NAME_DOCKER_REGISTRY: my.repo.cc
+  before_script:
+    # - docker login -u "BillingToken" -p $BillingToken $COMPANY_NAME_DOCKER_REGISTRY
+    # - docker login -u "${DOCKER_REGISTRY_USERNAME}" -p "${DOCKER_REGISTRY_PASSWORD}" $COMPANY_NAME_DOCKER_REGISTRY
+    # - docker login -u "RMTOKEN" -p ${RMTOKEN} $CI_REGISTRY
+    - echo $RMTOKEN | docker login -u "RMTOKEN" --password-stdin $CI_REGISTRY
+  script:
+    - cd server
+    - ls -l
+    - docker version
+    - echo $CI_REGISTRY
+    - echo ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA}
+    - docker build -t ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA} -f Dockerfile .
+    - docker tag ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA} ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA}
+  needs:
+    - pipeline: $UPSTREAM_PIPELINE_ID
+      job: $DEPENDENCY_JOB
+      artifacts: true
+  tags:
+    - aws
+    - m4-large

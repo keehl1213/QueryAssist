@@ -1,0 +1,90 @@
+include: pipeline/lib/stages.yaml
+
+.only_prd_template: &only_prd
+  only:
+    - tags
+
+prd:build-fullstack:
+  image: node:22.8.0
+  stage: prd:build
+  script:
+    - echo "npm fullstack build"
+    - echo "node version:"
+    - source ${ENV}
+    - cd frontend
+    - export ORIGINAL_NODE_ENV=$NODE_ENV
+    - export NODE_ENV='develop'
+    - npm ci -f
+    - export NODE_ENV=$ORIGINAL_NODE_ENV
+    - npm run build
+    - cp -r ./dist/* ../server/public
+    - cd ../server
+    - export ORIGINAL_NODE_ENV=$NODE_ENV
+    - export NODE_ENV='develop'
+    - npm ci
+    - export NODE_ENV=$ORIGINAL_NODE_ENV
+    - npm run build
+  artifacts:
+    paths:
+      - server
+      - frontend
+    expire_in: 2 hours
+  variables:
+    ENV: "${PRDENV}"
+  tags:
+    - aws
+    - m4-large
+  <<: *only_prd
+
+prd:containerize:
+  stage: prd:release
+  trigger:
+    include:
+      - local: pipeline/lib/containerize.yaml
+    strategy: depend
+  variables:
+    UPSTREAM_PIPELINE_ID: $CI_PIPELINE_ID
+    DEPENDENCY_JOB: prd:build-fullstack
+    ENV_SUFFIX: prd
+  <<: *only_prd
+
+prd:helm_deploy:
+  stage: prd:deploy
+  services:
+    - docker:dind
+  image: my.repo.cc/release/docker:latest
+  variables:
+    CD_CHART_REPO: queryassist-helm
+    CD_CHART_REPO_ROOT: helm-queryassist
+    CD_GIT_REPOSITORY: https://"QueryAssistToken":${QueryAssistToken}@gitlab.company_name.com/queryassist_group/${CD_CHART_REPO}.git
+    ENV: "${PRDENV}"
+    CI_COMMIT_BRANCH: "master"
+    ENV_SUFFIX: prd
+  before_script:
+    - git config --global user.name "${DOCKER_USERNAME}"
+    - git config --global user.email "${DOCKER_USERNAME}"
+    - docker login -u "RMTOKEN" -p ${RMTOKEN} $CI_REGISTRY
+  script:
+    - git clone --single-branch --branch $CI_COMMIT_BRANCH $CD_GIT_REPOSITORY
+    - cd ./$CD_CHART_REPO/$CD_CHART_REPO_ROOT
+    - docker pull ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA}
+    - docker pull ${DOCKER_TERRASCAN}
+    - export IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${CI_REGISTRY_IMAGE}/${ENV_SUFFIX}:${CI_COMMIT_SHORT_SHA})
+    - export TERRASCAN_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKER_TERRASCAN} )
+    - source ${ENV}
+    - echo "$(pwd)"
+    - envsubst < app_values_template.yaml > app_values.yaml
+    - yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' ai_values.yaml app_values.yaml > values.yaml 
+    - |     
+      CHANGES=$(git status --porcelain | wc -l)
+      if [[ "${CHANGES}" -gt 0 ]]; then
+        echo "Committing updated appVersion to chart repo"
+        git commit -am "update image tag" && git push origin $CI_COMMIT_BRANCH -o skip-ci
+      else
+        echo "Nothing to commit, quit the job"
+      fi
+  tags:
+    - aws
+    - m4-large
+    
+  <<: *only_prd

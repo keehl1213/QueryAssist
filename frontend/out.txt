@@ -1,0 +1,28 @@
+D:\Project\QueryAssist\frontend
+├── dist
+|  └── assets
+├── public
+└── src
+   ├── assets
+   |  ├── gifs
+   |  ├── icons
+   |  └── images
+   ├── components
+   |  ├── atoms
+   |  └── compose
+   ├── hooks
+   ├── locales
+   ├── pages
+   |  ├── App
+   |  ├── ChatRoom
+   |  └── Login
+   ├── requests
+   ├── router
+   ├── store
+   ├── styles
+   ├── types
+   └── utils
+
+directory: 1050
+
+ignored: directory (18)

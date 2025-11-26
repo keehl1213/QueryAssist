@@ -1,0 +1,11 @@
+stages:
+  - dev:build
+  - dev:release
+  - qas:build
+  #  - qas:code
+  - qas:release
+  - qas:deploy
+  - prd:build
+  #  - prd:code
+  - prd:release
+  - prd:deploy

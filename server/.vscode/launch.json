@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "runtimeVersion": "22.8.0",
+      "name": "Debug Nest Framework with npm script",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run-script",
+        "start:debug"
+      ],
+      "console": "integratedTerminal",
+      "restart": true
+    }
+  ]
+}

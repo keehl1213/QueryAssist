@@ -1,0 +1,14 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountEntity } from './entities/account.entity';
+import { AccountController } from './account.controller';
+import { AccountService } from './account.service';
+import { DataSource } from 'typeorm';
+
+@Module({
+	imports: [TypeOrmModule.forFeature([AccountEntity], process.env.DB_NAME)],
+	controllers: [AccountController],
+	providers: [AccountService],
+	exports: [AccountService],
+})
+export class AccountModule {}

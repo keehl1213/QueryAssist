@@ -1,0 +1,47 @@
+variables:
+  COMPANY_NAME_DOCKER_REGISTRY: my.repo.cc
+
+include: pipeline/lib/stages.yaml
+
+.only_dev_template: &only_dev
+  only:
+    refs:
+      - develop
+
+dev:build-fullstack:
+  image: node:22.8.0
+  stage: dev:build
+  script:
+    - echo "npm fullstack build"
+    - echo "node version:"
+    - source ${ENV}
+    - cd frontend
+    - npm ci -f
+    - npm run build
+    - cp -r ./dist/* ../server/public
+    - cd ../server
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - server
+      - frontend
+    expire_in: 2 hours
+  variables:
+    ENV: "${QASENV}"
+  tags:
+    - aws
+    - m4-large
+  <<: *only_dev
+
+dev:containerize:
+  stage: dev:release
+  trigger:
+    include:
+      - local: pipeline/lib/containerize.yaml
+    strategy: depend
+  variables:
+    UPSTREAM_PIPELINE_ID: $CI_PIPELINE_ID
+    DEPENDENCY_JOB: dev:build-fullstack
+    ENV_SUFFIX: dev
+  <<: *only_dev
