@@ -42,7 +42,7 @@ const ChatRoom: React.FC = () => {
 	const [contentLoading] = useState(false);
 	const [messageText] = useState(''); // 預設訊息文字為空，等user輸入後會更新訊息文字
 	const [chatList, setChatList] = useState<TTreeList>([]);
-	const [selectedPlugin, setSelectedPlugin] = useState('SRBG');
+	const [selectedPlugin, setSelectedPlugin] = useState('AI_QUERY');
 	const [isChatting, setIsChatting] = useState(false);
 	const [speechMode, setSpeechMode] = useState(false); // 語音辨識模式
 	const [speechContent, setSpeechContent] = useState('');

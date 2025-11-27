@@ -5,10 +5,10 @@ export enum SPEAK_MODE {
 }
 
 export enum INQUIRE_TYPE {
-	BO = <any>'01',
-	ETD = <any>'20',
-	Shipment = <any>'21',
-	'E&O accountability' = <any>'22',
+	A = <any>'1',
+	B = <any>'2',
+	C = <any>'3',
+	D = <any>'4',
 }
 
 export enum REGION_LIST {

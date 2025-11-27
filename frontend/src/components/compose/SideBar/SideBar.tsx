@@ -3,7 +3,7 @@ import { Button } from '@atoms';
 import Colors from '@/styles/color';
 import * as Styled from './Style';
 import CLOSE_ICON from '@assets/icons/closeIcon.svg?react';
-import LOGO_ICON from '@assets/icons/Logo.svg?react';
+// import LOGO_ICON from '@assets/icons/Logo.svg?react';
 import Icon from '@ant-design/icons';
 import { ApiOutlined } from '@ant-design/icons';
 import UserInfo from '../UserInfo/UserInfo';
@@ -39,7 +39,7 @@ const Sidebar: React.FC<PropsType> = React.memo(
 											alignContent: 'center',
 										}}
 									>
-										<Styled.LogoButton
+										{/* <Styled.LogoButton
 											style={{
 												padding: '0px 0px',
 												margin: '0 0 0 0',
@@ -55,7 +55,7 @@ const Sidebar: React.FC<PropsType> = React.memo(
 													}}
 												/>
 											}
-										/>
+										/> */}
 										<Button
 											style={{
 												padding: '8px 6px',
@@ -81,13 +81,14 @@ const Sidebar: React.FC<PropsType> = React.memo(
 								>
 									<Styled.KnowledgeBaseButton
 										onClick={() =>
-											handleSelectPlugin('SRBG')
+											handleSelectPlugin('AI_QUERY')
 										}
 									>
 										<ApiOutlined
 											style={{
 												color:
-													selectedPlugin === 'SRBG'
+													selectedPlugin ===
+													'AI_QUERY'
 														? Colors.figma_green_3
 														: Colors.figma_white_4,
 												marginRight: '8px',
@@ -102,13 +103,13 @@ const Sidebar: React.FC<PropsType> = React.memo(
 													textOverflow: 'ellipsis',
 													color:
 														selectedPlugin ===
-														'SRBG'
+														'AI_QUERY'
 															? Colors.figma_green_3
 															: Colors.figma_white_4,
 												}}
-												title="SRBG 物料E2E現況查詢"
+												title="AI智慧查詢"
 											>
-												SRBG 物料E2E現況查詢
+												AI智慧查詢
 											</span>
 										</Styled.PluginLabel>
 									</Styled.KnowledgeBaseButton>
